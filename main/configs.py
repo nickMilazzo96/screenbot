@@ -1,5 +1,5 @@
 ### OpenAI API key ###
-api_key = "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"
+api_key = "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"  # noqa: E501
 model_id = "ft:gpt-4o-mini-2024-07-18:personal::AG5eHVCS"  # model tuned with v3 data on Oct 8
 ###
 

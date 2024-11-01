@@ -1,10 +1,12 @@
 import json
+from pathlib import Path
+from typing import Any
 
 import requests
 from bs4 import BeautifulSoup
 
 
-def ab_clean(text):  # cleans up the abstract given in xml cause it's full of symbols and extraneous text
+def ab_clean(text: str) -> str:  # cleans up the abstract given in xml cause it's full of symbols and extraneous text
     start = text.find("ABSTRACT")
     text = text[start + len("ABSTRACT") :]
     end = text.find(" style=")
@@ -24,17 +26,19 @@ def ab_clean(text):  # cleans up the abstract given in xml cause it's full of sy
     return text.strip()
 
 
-def rss_scrape(rss_urls):  # from a given rss url returns a list of lists with elements [pmid, title, abstract]
+def rss_scrape(
+    rss_urls: list[str],
+) -> list[Any]:  # from a given rss url returns a list of lists with elements [pmid, title, abstract]
     studies = []  # this is where you'll collect your new studies
     try:  # look for exlcusion_list.json
-        with open("screenbot/main/json/exclusion_list.json") as f:
+        with Path.open("screenbot/main/json/exclusion_list.json") as f:
             exclusion_list = json.load(f)
             exclusion_set = set(exclusion_list)  # load json list and convert it to set for improved search
     except FileNotFoundError:
-        exclusion_set = set([])  # if set doesn't exist, make it
+        exclusion_set = set()  # if set doesn't exist, make it
 
     for url in rss_urls:
-        feed = requests.get(url)
+        feed = requests.get(url, timeout=300)
         feed_content = feed.content
         soup = BeautifulSoup(feed_content, "xml")
         for item in soup.find_all("item"):
@@ -50,7 +54,7 @@ def rss_scrape(rss_urls):  # from a given rss url returns a list of lists with e
                 exclusion_set.add(pmid)
             # convert set to list for json dump
             exclusion_list = list(exclusion_set)
-            with open("screenbot/main/json/exclusion_list.json", "w") as f:
+            with Path.open("screenbot/main/json/exclusion_list.json", "w") as f:
                 json.dump(exclusion_list, f)
     return studies
 
