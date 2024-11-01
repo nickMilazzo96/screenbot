@@ -1,6 +1,7 @@
+import json
+
 import requests
 from bs4 import BeautifulSoup
-import json
 
 
 def ab_clean(text):  # cleans up the abstract given in xml cause it's full of symbols and extraneous text
@@ -26,7 +27,7 @@ def ab_clean(text):  # cleans up the abstract given in xml cause it's full of sy
 def rss_scrape(rss_urls):  # from a given rss url returns a list of lists with elements [pmid, title, abstract]
     studies = []  # this is where you'll collect your new studies
     try:  # look for exlcusion_list.json
-        with open("screenbot/main/json/exclusion_list.json", "r") as f:
+        with open("screenbot/main/json/exclusion_list.json") as f:
             exclusion_list = json.load(f)
             exclusion_set = set(exclusion_list)  # load json list and convert it to set for improved search
     except FileNotFoundError:

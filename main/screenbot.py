@@ -1,12 +1,11 @@
-from screenbot_funcs import *
-from rss_funcs import *
 from airtable_export import airtable_batch_upload
-
+from rss_funcs import *
+from screenbot_funcs import *
 
 search_and_screen()
 
 # Load the list of lists from a JSON file
-with open("screenbot/main/json/screened_studies.json", "r") as f:
+with open("screenbot/main/json/screened_studies.json") as f:
     records = json.load(f)
 
 # Batch processing: Send records in batches of up to 10

@@ -1,7 +1,5 @@
 import json
 import os
-import xml.etree.ElementTree as ET
-from pathlib import Path
 
 import configs as configs
 import openai
@@ -10,11 +8,11 @@ from rss_funcs import *
 
 
 def search_and_screen():  # takes list of lists, each element [pmid, title, abstract] and appends new "relevance" element. I.e., [pmid, title, abstract, relevant]
-    with open("screenbot/main/json/rss_feeds.json", "r") as f:
+    with open("screenbot/main/json/rss_feeds.json") as f:
         rss_urls = json.load(f)
 
     studies_list = rss_scrape(
-        rss_urls
+        rss_urls,
     )  # takes a list of rss feeds, returns a list of lists with elements [pmid, title, abstract]
 
     # Iteratively pull studies from PubMed using search strings in df, put outputs in new dataframe 'results'
