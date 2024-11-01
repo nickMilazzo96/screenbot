@@ -411,6 +411,15 @@ wheels = [
 ]
 
 [[package]]
+name = "nodeenv"
+version = "1.9.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/43/16/fc88b08840de0e0a72a2f9d8c6bae36be573e475a6326ae854bcc549fc45/nodeenv-1.9.1.tar.gz", hash = "sha256:6ec12890a2dab7946721edbfbcd91f3319c6ccc9aec47be7c7e6b7011ee6645f", size = 47437 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d2/1d/1b658dbd2b9fa9c4c9f32accbfc0205d532c8c6194dc0f2a4c0428e7128a/nodeenv-1.9.1-py2.py3-none-any.whl", hash = "sha256:ba11c9782d29c27c70ffbdda2d7415098754709be8a7056d79a737cd901155c9", size = 22314 },
+]
+
+[[package]]
 name = "numpy"
 version = "1.24.4"
 source = { registry = "https://pypi.org/simple" }
@@ -648,6 +657,19 @@ wheels = [
 ]
 
 [[package]]
+name = "pyright"
+version = "1.1.387"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "nodeenv" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c2/32/e7187478d3105d6d7edc9b754d56472ee06557c25cc404911288fee1796a/pyright-1.1.387.tar.gz", hash = "sha256:577de60224f7fe36505d5b181231e3a395d427b7873be0bbcaa962a29ea93a60", size = 21939 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a0/18/c497df36641b0572f5bd59ae147b08ccaa6b8086397d50e1af97cc2ddcf6/pyright-1.1.387-py3-none-any.whl", hash = "sha256:6a1f495a261a72e12ad17e20d1ae3df4511223c773b19407cfa006229b1b08a5", size = 18577 },
+]
+
+[[package]]
 name = "python-dateutil"
 version = "2.9.0.post0"
 source = { registry = "https://pypi.org/simple" }
@@ -694,6 +716,11 @@ dependencies = [
     { name = "requests" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "pyright" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "bio", specifier = ">=1.6.2" },
@@ -701,6 +728,9 @@ requires-dist = [
     { name = "openai", specifier = ">=1.53.0" },
     { name = "requests", specifier = ">=2.5.4.1" },
 ]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pyright", specifier = ">=1.1.387" }]
 
 [[package]]
 name = "six"

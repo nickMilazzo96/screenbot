@@ -36,7 +36,7 @@ target-version = "py39"
 [tool.ruff.lint]
 # See https://docs.astral.sh/ruff/rules/
 select = ["ALL"]
-ignore = []
+ignore = ["D", "G"]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
@@ -48,3 +48,8 @@ quote-style = "double"
 
 # Like Black, indent with spaces, rather than tabs.
 indent-style = "space"
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.387",
+]
