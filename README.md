@@ -1,3 +1,11 @@
+# So far we’ve got:
+
+- persistent config
+- admins can update config
+- maybe varying permissions levels (non admin can add feeds and see results?)
+- service runs async (batches), outputs results to Airtable
+  As a first step if you can stand something up that does all that locally, that’s a great start
+
 Hermit: https://cashapp.github.io/hermit/usage/get-started/
 
 UV: https://docs.astral.sh/uv/
