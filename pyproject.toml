@@ -10,3 +10,41 @@ dependencies = [
     "openai>=0.8.0",
     "requests>=2.31.0",
 ]
+
+[tool.uv]
+# https://docs.astral.sh/uv/reference/settings/
+managed = true
+index-url = "https://test.pypi.org/simple"
+
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".git",
+    ".ruff_cache",
+    ".venv",
+    ".vscode",
+    "_build",
+    "dist",
+]
+
+line-length = 120
+indent-width = 4
+
+# Assume Python 3.9
+target-version = "py39"
+
+[tool.ruff.lint]
+# See https://docs.astral.sh/ruff/rules/
+select = ["ALL"]
+ignore = []
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
