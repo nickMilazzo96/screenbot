@@ -1,0 +1,55 @@
+[project]
+name = "screenbot"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "bio>=1.6.2",
+    "bs4>=0.0.2",
+    "openai>=1.53.0",
+    "requests>=2.5.4.1",
+]
+
+[tool.uv]
+# https://docs.astral.sh/uv/reference/settings/
+managed = true
+index-url = "https://pypi.org/simple"
+
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".git",
+    ".ruff_cache",
+    ".venv",
+    ".vscode",
+    "_build",
+    "dist",
+]
+
+line-length = 120
+indent-width = 4
+
+# Assume Python 3.9
+target-version = "py39"
+
+[tool.ruff.lint]
+# See https://docs.astral.sh/ruff/rules/
+select = ["ALL"]
+ignore = ["D", "G"]
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.387",
+]
