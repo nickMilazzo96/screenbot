@@ -1,53 +1,22 @@
-# So far we’ve got:
+# Screenbot
 
-- persistent config
-- admins can update config
-- maybe varying permissions levels (non admin can add feeds and see results?)
-- service runs async (batches), outputs results to Airtable
-  As a first step if you can stand something up that does all that locally, that’s a great start
+TODO(nmilazzo): Description of the repo
 
-Hermit: https://cashapp.github.io/hermit/usage/get-started/
+## Developing
 
-UV: https://docs.astral.sh/uv/
+### IDE
 
-Just: https://just.systems/man/en/
+We recommend using Visual Studio Code and installing the following extensions:
 
-#
+- vscode-just
+- ruff
+- Python
 
-Installed Hermit following instructions
-curl -fsSL https://github.com/cashapp/hermit/releases/download/stable/install.sh | /bin/bash
+We also recommend adding the following to your `settings.json`:
 
-Added /Users/fwallace/bin to PATH in zshrc so Hermit is in PATH
-Ran hermit init
-Added shell hooks according to: https://cashapp.github.io/hermit/usage/shell/
-
-Installed uv and just (hermit install uv, hermit install just, hermit install ruff)
-uv init
-file ~/Library/Caches/hermit/binaries/uv-0.4.29/uv
-Added packages (uv add ...)
-
-Now you can run everything in a virtual environment:
-
-```sh
-screenbot🐚 fwallace/setup-dev-env [~/dev/screenbot] >uv run python main/screenbot_funcs.py
-Traceback (most recent call last):
-  File "/Users/fwallace/dev/screenbot/main/screenbot_funcs.py", line 94, in <module>
-    pubmed_scrape()
-TypeError: pubmed_scrape() missing 4 required positional arguments: 'ncbi_email', 'search_string', 'max_results', and 'min_date'
-```
-
-TODO:
-
-Add just commands for:
-
-- lint
-- format
-- type check
-
-- format on save in VS code
-- Install Ruff extension in VS Code
-
-```js
+```json
+// Python settings
+"python.analysis.autoImportCompletions": true,
 "[python]": {
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "charliermarsh.ruff",
@@ -58,7 +27,25 @@ Add just commands for:
 }
 ```
 
-Next:
+### Tooling
 
-- Add CI on GH actions
-- Setup simple server
+This project uses the following tools for environment management:
+
+- [Hermit](https://cashapp.github.io/hermit/usage/get-started/) manages the installed tools
+- [uv](https://docs.astral.sh/uv/) manages Python and our project environments
+- [just](https://just.systems/man/en/) makes it extremely simple to run commands
+
+To begin, follow instructions to install Hermit. You may also need to add the install path to your PATH. Replace the
+path and filename in this command appropriately:
+
+```sh
+echo "export PATH=$PATH:/path/to/hermit/bin" >> ~/.zshrc
+```
+
+It's recommended to [add Hermit shell hooks](https://cashapp.github.io/hermit/usage/shell/) as well.
+
+Now, you can simply run `just setup` to setup your virtual environment. Other commands are available to support
+development - simply run `just` to see the full list.
+
+You may also use `uv` to interact with the virtual environment. For example, to run any commands in your virtual
+environment, run `uv run ...`, e.g. `uv run python screenbot.py`.
