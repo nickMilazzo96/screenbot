@@ -93,7 +93,7 @@ def search_and_screen():  # takes list of lists, each element [pmid, title, abst
 
     # Iteratively pull studies from PubMed using search strings in df, put outputs in new dataframe 'results'
     for study in studies_list:
-        study = study.append(get_gpt_response(configs.api_key, study[1], study[2]))
+        study = study.append(get_gpt_response(api_keys.openai, study[1], study[2]))
 
     # Create json payload to push to Airtable
     with open("json/screened_studies.json", "w") as p:
