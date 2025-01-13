@@ -1,9 +1,60 @@
 import requests
 from bs4 import BeautifulSoup
 import json
-import openai
+from openai import OpenAI
 import configs
 import api_keys
+from datetime import datetime
+
+# Airtable API configuration
+AIRTABLE_API_KEY = api_keys.airtable_main
+BASE_ID = configs.BASE_ID
+TABLE_NAME = configs.TABLE_NAME
+COLUMN_NAME = "PMID"
+
+# Airtable API endpoint
+url = f"https://api.airtable.com/v0/{BASE_ID}/{TABLE_NAME}"
+
+# Headers for the request
+headers = {"Authorization": f"Bearer {AIRTABLE_API_KEY}"}
+
+
+# Function to fetch all records from Airtable
+def fetch_exclusion_list():
+    records = []
+    offset = None
+
+    while True:
+        params = {}
+        if offset:
+            params["offset"] = offset
+
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()
+        data = response.json()
+
+        records.extend(data["records"])
+
+        if "offset" in data:
+            offset = data["offset"]
+        else:
+            break
+
+    return records
+
+
+# Function to extract PMID values and save to JSON
+def make_exclusion_list():
+    records = fetch_exclusion_list()
+    pmid_values = {
+        record["fields"].get(COLUMN_NAME)
+        for record in records
+        if COLUMN_NAME in record["fields"]
+    }
+
+    with open("json/exclusion_list.json", "w") as json_file:
+        json.dump(list(pmid_values), json_file, indent=4)
+
 
 ## RSS Scraping ##
 def ab_clean(
@@ -30,7 +81,7 @@ def ab_clean(
 
 def rss_scrape(
     rss_urls,
-):  # from a given rss url returns a list of lists with elements [pmid, title, abstract]
+):  # from a given rss url returns a list of lists with elements [pmid, title, abstract, pub_date]
     studies = []  # this is where you'll collect your new studies
     try:  # look for exlcusion_list.json
         with open("json/exclusion_list.json", "r") as f:
@@ -46,29 +97,27 @@ def rss_scrape(
         feed_content = feed.content
         soup = BeautifulSoup(feed_content, features="xml")
         for item in soup.find_all("item"):
+            pub_date = datetime.strptime(item.find("pubDate").text[5:16], "%d %b %Y")
             pmid = item.find("dc:identifier").text[5:]
             if (
-                pmid in exclusion_set
-            ):  # check for pmid in exclusion_set. Only continue to other data if pmid is NOT in exclusion_set
+                pmid in exclusion_set or (datetime.now() - pub_date).days > 120
+            ):  # check for pmid in exclusion_set or if pub_date is > 3 months from today. Only continue to other data if neither condition is met
                 pass
             else:
                 title = item.find("title").text
                 abstract = ab_clean(item.find("content:encoded").text)
-                studies.append([pmid, title, abstract])
-                exclusion_set.add(pmid)
-            # convert set to list for json dump
-            exclusion_list = list(exclusion_set)
-            with open("json/exclusion_list.json", "w") as f:
-                json.dump(exclusion_list, f)
+                pub_date = datetime.strftime(pub_date, "%B %d, %Y")
+                studies.append([pmid, title, abstract, pub_date])
     return studies
 
 
 ## Process studies with GPT ##
 def get_gpt_response(
-    api_key, title, abstract
+    title, abstract
 ):  # takes title + abstract and returns "y" or "n" for relevance
-    openai.api_key = api_keys.openai
-    response = openai.chat.completions.create(
+    client = OpenAI(api_key=api_keys.openai)
+
+    response = client.chat.completions.create(
         model="ft:gpt-4o-mini-2024-07-18:personal::AFlBwOlr",
         messages=[
             {
@@ -89,11 +138,10 @@ def search_and_screen():  # takes list of lists, each element [pmid, title, abst
 
     studies_list = rss_scrape(
         rss_urls
-    )  # takes a list of rss feeds, returns a list of lists with elements [pmid, title, abstract]
+    )  # takes a list of rss feeds, returns a list of lists with elements [pmid, title, abstract, pub_date]
 
-    # Iteratively pull studies from PubMed using search strings in df, put outputs in new dataframe 'results'
     for study in studies_list:
-        study = study.append(get_gpt_response(api_keys.openai, study[1], study[2]))
+        study = study.append(get_gpt_response(study[1], study[2]))
 
     # Create json payload to push to Airtable
     with open("json/screened_studies.json", "w") as p:
@@ -104,9 +152,10 @@ def search_and_screen():  # takes list of lists, each element [pmid, title, abst
 
 # Headers for Airtable API requests
 headers = {
-    "Authorization": f"Bearer {api_keys.airtable}",
+    "Authorization": f"Bearer {api_keys.airtable_main}",
     "Content-Type": "application/json",
 }
+
 
 def airtable_batch_upload(
     records_batch,
@@ -118,10 +167,11 @@ def airtable_batch_upload(
         "records": [
             {
                 "fields": {
-                    "Title": record[1],
+                    "Study Title": record[1],
                     "PMID": record[0],
                     "Abstract": record[2],
-                    "Relevant?": record[3],
+                    "Date Published": record[3],
+                    "Screenbot Relevant?": record[4],
                 }
             }
             for record in records_batch
@@ -134,10 +184,11 @@ def airtable_batch_upload(
     else:
         print(f"Failed to create batch. Error: {response.text}")
 
+
 ############################################################
 ############################################################
-
-
+fetch_exclusion_list()
+make_exclusion_list()
 search_and_screen()
 
 # Load the list of lists from a JSON file
