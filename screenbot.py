@@ -100,7 +100,7 @@ def rss_scrape(
             pub_date = datetime.strptime(item.find("pubDate").text[5:16], "%d %b %Y")
             pmid = item.find("dc:identifier").text[5:]
             if (
-                pmid in exclusion_set or (datetime.now() - pub_date).days > 120
+                pmid in exclusion_set or (datetime.now() - pub_date).days > 14
             ):  # check for pmid in exclusion_set or if pub_date is > 3 months from today. Only continue to other data if neither condition is met
                 pass
             else:
